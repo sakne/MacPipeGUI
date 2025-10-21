@@ -34,6 +34,7 @@ playground.xcworkspace
 
 .build/
 .Products/
+.MacPipeGUI
 
 # CocoaPods
 #
