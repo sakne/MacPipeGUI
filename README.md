@@ -108,11 +108,11 @@ Deploy your content to Steam:
 - Xcode 15.0 or later
 - Swift 5.9 or later
 
-### Build Steps
+### Build StepsMIT Non-Commercial License
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/saknedev/MacPipeGUI.git
+   git clone https://github.com/sakne/MacPipeGUI.git
    cd MacPipeGUI
    ```
    
