@@ -44,7 +44,7 @@ struct ContentView: View {
                     HStack(spacing: 8) {
                         SocialLinkButton(icon: "link", title: "My Game", url: "https://store.steampowered.com/app/3453530/Coffie_Simulator")
                         SocialLinkButton(icon: "envelope.fill", title: "Email", url: "mailto:onebaney@protonmail.com")
-                        SocialLinkButton(icon: "globe", title: "GitHub", url: "https://github.com/saknedev")
+                        SocialLinkButton(icon: "globe", title: "GitHub", url: "https://github.com/sakne")
                     }
                 }
             }
