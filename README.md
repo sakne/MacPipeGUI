@@ -201,13 +201,6 @@ Contributions are welcome! Here's how you can help:
 - Update documentation for new features
 
 ---
-
-# License
-
-This project is licensed under the **GPLv3 or later** - see the [LICENSE](LICENSE) file for details.
-
----
-
 # Support
 
 If you find this tool helpful, please consider:
@@ -216,5 +209,12 @@ If you find this tool helpful, please consider:
 - Sharing it with other developers
 
 ---
+
+# License
+
+This project is licensed under the **GPLv3** - see the [LICENSE](LICENSE) file for details.
+
+---
+
 
 <p align="center">Made with ❤️ by SakneDev</p>
