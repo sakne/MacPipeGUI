@@ -14,7 +14,6 @@ export default function SettingsPage() {
     const [validationStatus, setValidationStatus] = useState<{ valid: boolean, message: string } | null>(null);
     const [passwordSaveStatus, setPasswordSaveStatus] = useState<string | null>(null);
     const [passwordLoadError, setPasswordLoadError] = useState<string | null>(null);
-    const [hasStoredPassword, setHasStoredPassword] = useState(false);
 
     const setTempPassword = useStore(state => state.setTempPassword);
 
@@ -32,11 +31,9 @@ export default function SettingsPage() {
                 if (result.success && result.password) {
                     setPassword(result.password);
                     setTempPassword(result.password);
-                    setHasStoredPassword(true);
                     setPasswordLoadError(null);
                 } else if (!result.success) {
                     // Something is stored but we couldn't decrypt it (keyring locked, format mismatch, etc.)
-                    setHasStoredPassword(true);
                     setPasswordLoadError(result.error || 'Could not load saved password — please re-enter it and save.');
                 }
             } catch (e) {
@@ -61,7 +58,6 @@ export default function SettingsPage() {
                     const result = await ipc.invoke('save-secure-password', password);
                     if (result.success) {
                         setPasswordSaveStatus(result.encrypted ? '🔐 Password saved securely' : '⚠️ Password saved (not encrypted)');
-                        setHasStoredPassword(true);
                         setPasswordLoadError(null);
                     } else {
                         setPasswordSaveStatus('❌ Failed to save password securely');
@@ -69,7 +65,6 @@ export default function SettingsPage() {
                 } else {
                     // Not remembering: remove from disk, keep in-session via tempPassword.
                     await ipc.invoke('clear-secure-password');
-                    setHasStoredPassword(false);
                     setPasswordSaveStatus('ℹ️ Password active for this session only (not persisted)');
                 }
             } else {
@@ -83,7 +78,6 @@ export default function SettingsPage() {
                 } else {
                     // Nothing to preserve — clear any remnant from disk.
                     await ipc.invoke('clear-secure-password');
-                    setHasStoredPassword(false);
                     setPasswordSaveStatus('🗑️ Password cleared');
                 }
             }
