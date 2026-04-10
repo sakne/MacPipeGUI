@@ -38,8 +38,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          # Capture installer, latest.yml, and blockmap for differential updates
-          path: "MacPipeGUI Electron/release/**"
+          # Only capture distributable files, not the unpacked directory
+          path: |
+            MacPipeGUI Electron/release/*.exe
+            MacPipeGUI Electron/release/*.exe.blockmap
+            MacPipeGUI Electron/release/latest.yml
           if-no-files-found: error
 
   build-macos:
@@ -69,7 +72,12 @@ jobs:
           name: macos-build
           # Must include .dmg, .zip, .zip.blockmap, and latest-mac.yml.
           # electron-updater downloads the .zip (not the .dmg) for updates.
-          path: "MacPipeGUI Electron/release/**"
+          path: |
+            MacPipeGUI Electron/release/*.dmg
+            MacPipeGUI Electron/release/*.dmg.blockmap
+            MacPipeGUI Electron/release/*.zip
+            MacPipeGUI Electron/release/*.zip.blockmap
+            MacPipeGUI Electron/release/latest-mac.yml
           if-no-files-found: error
 
   build-linux:
@@ -97,7 +105,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
-          path: "MacPipeGUI Electron/release/**"
+          # Only capture distributable files, not the unpacked directory
+          path: |
+            MacPipeGUI Electron/release/*.AppImage
+            MacPipeGUI Electron/release/*.deb
+            MacPipeGUI Electron/release/*.rpm
+            MacPipeGUI Electron/release/latest-linux.yml
           if-no-files-found: error
 
   # Single release job runs after all three builds succeed.
@@ -133,7 +146,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/**
+          files: release/*
           draft: false
           prerelease: false
           generate_release_notes: true
