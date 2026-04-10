@@ -10,9 +10,10 @@ publish:
   provider: github
   owner: sakne
   repo: MacPipeGUI
-  releaseType: release
+  releaseType: draft
 win:
   icon: public/app-icon.png
+  artifactName: MacPipeGUI-Multi-Setup-${version}.${ext}
   target:
     - target: nsis
       arch:
@@ -22,16 +23,21 @@ nsis:
   allowToChangeInstallationDirectory: true
   shortcutName: MacPipeGUI Multi
   uninstallDisplayName: MacPipeGUI Multi
-  artifactName: MacPipeGUI-Multi-Setup-${version}.${ext}
 mac:
   icon: public/app-icon.png
+  artifactName: MacPipeGUI-Multi-${version}-${arch}.${ext}
   target:
     - target: dmg
       arch:
         - x64
         - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
 linux:
   icon: public/app-icon.png
+  artifactName: MacPipeGUI-Multi-${version}.${ext}
   target:
     - AppImage
   category: Development

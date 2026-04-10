@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function BuildPage() {
     const profiles = useStore(state => state.profiles);
     const config = useStore(state => state.config);
-    const [selectedId, setSelectedId] = useState<string>('');
+    const selectedId = useStore(state => state.selectedProfileId) ?? '';
+    const selectProfile = useStore(state => state.selectProfile);
     const [isBuilding, setIsBuilding] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
     const [showSteamGuard, setShowSteamGuard] = useState(false);
@@ -144,7 +145,7 @@ export default function BuildPage() {
                         <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Profile</label>
                         <select
                             value={selectedId}
-                            onChange={(e) => setSelectedId(e.target.value)}
+                            onChange={(e) => selectProfile(e.target.value || null)}
                             className="w-full bg-bg-main border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all font-medium"
                             disabled={isBuilding}
                         >

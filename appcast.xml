@@ -5,35 +5,33 @@
     <link>https://github.com/sakne/MacPipeGUI/releases</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-    
-    <!-- 
-    Add new items here when releasing updates.
-    The sparkle:version should match your CFBundleVersion.
-    The sparkle:shortVersionString should match your CFBundleShortVersionString.
-    
-    Example item:
+
     <item>
-      <title>Version 1.2.0</title>
-      <sparkle:version>1.2.0</sparkle:version>
-      <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
+      <title>Version 1.3.0</title>
+      <sparkle:version>1.3.0</sparkle:version>
+      <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
       <description><![CDATA[
-        <h2>What's New</h2>
+        <h2>What's New in 1.3.0</h2>
         <ul>
-          <li>New feature X</li>
-          <li>Bug fix Y</li>
+          <li>Fixed password saving/loading on Linux and macOS — safeStorage encryption failures now fall back to plain base64 instead of silently discarding the password</li>
+          <li>Fixed cross-session decryption mismatch that caused passwords stored in one session to become unreadable in the next</li>
+          <li>Fixed Settings page silently wiping a stored password when the decryption error left the field blank</li>
+          <li>Added clear warning when a saved password cannot be decrypted, prompting re-entry</li>
+          <li>Fixed profile search — the search box now actually filters the profile list</li>
+          <li>Build Runner now pre-selects the profile chosen on the Profiles tab</li>
+          <li>Build logs and running state no longer reset when switching tabs mid-build</li>
         </ul>
       ]]></description>
-      <pubDate>Wed, 15 Jan 2026 20:00:00 +0000</pubDate>
-      <enclosure 
-        url="https://github.com/sakne/MacPipeGUI/releases/download/v1.2.0/MacPipeGUI.dmg"
-        sparkle:version="1.2.0"
-        sparkle:shortVersionString="1.2.0"
-        length="12345678"
+      <pubDate>Thu, 10 Apr 2026 00:00:00 +0000</pubDate>
+      <enclosure
+        url="https://github.com/sakne/MacPipeGUI/releases/download/v1.3.0-swift/MacPipeGUI.dmg"
+        sparkle:version="1.3.0"
+        sparkle:shortVersionString="1.3.0"
+        length="0"
         type="application/octet-stream"
       />
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
     </item>
-    -->
-    
+
   </channel>
 </rss>

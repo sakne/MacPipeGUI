@@ -14,6 +14,7 @@ export default function ProfilesPage() {
     const selectProfile = useStore(state => state.selectProfile);
     const selectedProfileId = useStore(state => state.selectedProfileId);
     const deleteProfile = useStore(state => state.deleteProfile);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const handleCreate = () => {
         const newProfile: AppProfile = {
@@ -48,6 +49,8 @@ export default function ProfilesPage() {
                         <Search className="absolute left-3 top-2.5 text-text-muted w-4 h-4 group-focus-within:text-accent transition-colors" />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search profiles..."
                             className="w-full bg-bg-main border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 text-white placeholder-text-muted transition-all"
                         />
@@ -55,7 +58,17 @@ export default function ProfilesPage() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
-                    {profiles.map(profile => (
+                    {profiles.length > 0 && searchQuery && profiles.filter(p =>
+                        p.appName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        p.appID.includes(searchQuery)
+                    ).length === 0 && (
+                        <p className="text-xs text-text-muted text-center py-4">No profiles match "{searchQuery}"</p>
+                    )}
+                    {profiles.filter(p =>
+                        !searchQuery ||
+                        p.appName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        p.appID.includes(searchQuery)
+                    ).map(profile => (
                         <div
                             key={profile.id}
                             onClick={() => selectProfile(profile.id)}

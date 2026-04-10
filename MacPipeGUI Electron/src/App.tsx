@@ -70,7 +70,8 @@ function App() {
       <div className="flex-1 bg-bg-dark rounded-2xl border border-white/5 shadow-xl overflow-hidden relative">
         <div className="absolute inset-0">
           {activeTab === 'profiles' && <ProfilesPage />}
-          {activeTab === 'build' && <BuildPage />}
+          {/* BuildPage is always mounted so build logs and running state survive tab switches */}
+          <div className={activeTab === 'build' ? 'h-full' : 'hidden'}><BuildPage /></div>
           {activeTab === 'settings' && <SettingsPage />}
         </div>
       </div>

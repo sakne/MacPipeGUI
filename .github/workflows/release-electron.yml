@@ -10,6 +10,9 @@ permissions:
   contents: write
 
 jobs:
+  # Each platform builds independently and uploads its output as a
+  # GitHub Actions artifact (--publish never avoids the race condition
+  # where three jobs simultaneously try to create the same GitHub release).
   build-windows:
     runs-on: windows-latest
     steps:
@@ -22,12 +25,12 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./MacPipeGUI Electron
+        working-directory: "./MacPipeGUI Electron"
         run: npm install
 
       - name: Build Windows
-        working-directory: ./MacPipeGUI Electron
-        run: npm run build:win -- --publish always
+        working-directory: "./MacPipeGUI Electron"
+        run: npm run build:win -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,9 +38,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: |
-            MacPipeGUI Electron/release/*.exe
-            MacPipeGUI Electron/release/latest.yml
+          # Capture installer, latest.yml, and blockmap for differential updates
+          path: "MacPipeGUI Electron/release/**"
+          if-no-files-found: error
 
   build-macos:
     runs-on: macos-latest
@@ -51,12 +54,12 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./MacPipeGUI Electron
+        working-directory: "./MacPipeGUI Electron"
         run: npm install
 
       - name: Build macOS
-        working-directory: ./MacPipeGUI Electron
-        run: npm run build:mac -- --publish always
+        working-directory: "./MacPipeGUI Electron"
+        run: npm run build:mac -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -64,9 +67,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
-          path: |
-            MacPipeGUI Electron/release/*.dmg
-            MacPipeGUI Electron/release/latest-mac.yml
+          # Must include .dmg, .zip, .zip.blockmap, and latest-mac.yml.
+          # electron-updater downloads the .zip (not the .dmg) for updates.
+          path: "MacPipeGUI Electron/release/**"
+          if-no-files-found: error
 
   build-linux:
     runs-on: ubuntu-latest
@@ -80,12 +84,12 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./MacPipeGUI Electron
+        working-directory: "./MacPipeGUI Electron"
         run: npm install
 
       - name: Build Linux
-        working-directory: ./MacPipeGUI Electron
-        run: npm run build:linux -- --publish always
+        working-directory: "./MacPipeGUI Electron"
+        run: npm run build:linux -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -93,46 +97,46 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
-          path: |
-            MacPipeGUI Electron/release/*.AppImage
-            MacPipeGUI Electron/release/latest-linux.yml
+          path: "MacPipeGUI Electron/release/**"
+          if-no-files-found: error
 
+  # Single release job runs after all three builds succeed.
+  # Downloads every artifact into one flat directory then publishes
+  # the GitHub release in one shot — no concurrent write conflicts.
   release:
     needs: [build-windows, build-macos, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+
     steps:
       - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
           name: windows-build
           path: release
-        continue-on-error: true
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
           name: macos-build
           path: release
-        continue-on-error: true
 
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
           name: linux-build
           path: release
-        continue-on-error: true
 
       - name: List release files
-        run: ls -la release/ || echo "No release folder"
+        run: ls -lh release/
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          files: release/*
+          files: release/**
           draft: false
           prerelease: false
           generate_release_notes: true
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
