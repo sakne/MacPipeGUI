@@ -112,8 +112,17 @@ export default function BuildPage() {
             return;
         }
 
+        // Fetch password the same way as handleRun so config.password is populated
+        let finalPassword = useStore.getState().tempPassword;
+        if (!finalPassword) {
+            const passResult = await ipc.invoke('get-secure-password');
+            if (passResult.success && passResult.password) {
+                finalPassword = passResult.password;
+            }
+        }
+
         setLogs([]);
-        ipc.send('test-run', selectedProfile, config);
+        ipc.send('test-run', selectedProfile, { ...config, password: finalPassword });
     };
 
     const submitGuardCode = () => {
