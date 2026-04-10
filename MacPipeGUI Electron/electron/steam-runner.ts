@@ -253,6 +253,15 @@ export class SteamRunner {
                     }).show();
                 }
             }
+            if (lowerOutput.includes("waiting for confirmation...ok")){
+                window.webContents.send("build-log", `✅ Steam Guard authenticated!`);
+                window.webContents.send("build-log", `Starting scan and upload...\n\n`);
+            }
+            if (lowerOutput.includes("building depot")){
+                const depotMatch = lowerOutput.match(/building depot (\d+)/);
+                const depotId = depotMatch ? depotMatch[1] : "?";
+                window.webContents.send("build-log", `🤖 Scanning and uploading depot with ID ${depotId}...`);
+            }
         };
 
         this.process.stdout.on('data', (data) => checkOutputForTriggers(data.toString()));
