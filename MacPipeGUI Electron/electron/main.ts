@@ -98,14 +98,28 @@ app.whenReady().then(() => {
 
   ipcMain.handle('save-secure-password', (_, password: string) => {
     try {
-      if (!safeStorage.isEncryptionAvailable()) {
-        // Fallback
-        store.set(SECURE_PASSWORD_KEY, Buffer.from(password).toString('base64'));
-        return { success: true, encrypted: false };
+      let data: string;
+      let encrypted = false;
+
+      if (safeStorage.isEncryptionAvailable()) {
+        try {
+          const encryptedBuffer = safeStorage.encryptString(password);
+          data = encryptedBuffer.toString('base64');
+          encrypted = true;
+        } catch (encErr) {
+          // Fall back to plain base64 so the password is still usable.
+          console.warn('safeStorage encryption failed, using plain fallback:', encErr);
+          data = Buffer.from(password).toString('base64');
+          encrypted = false;
+        }
+      } else {
+        data = Buffer.from(password).toString('base64');
+        encrypted = false;
       }
-      const encrypted = safeStorage.encryptString(password);
-      store.set(SECURE_PASSWORD_KEY, encrypted.toString('base64'));
-      return { success: true, encrypted: true };
+
+      // Store as JSON so the loader knows which path to use
+      store.set(SECURE_PASSWORD_KEY, JSON.stringify({ data, encrypted }));
+      return { success: true, encrypted };
     } catch (e) {
       console.error('Failed to save password:', e);
       return { success: false, error: String(e) };
@@ -117,15 +131,43 @@ app.whenReady().then(() => {
       const stored = store.get(SECURE_PASSWORD_KEY) as string;
       if (!stored) return { success: true, password: '' };
 
-      const buffer = Buffer.from(stored, 'base64');
+      // Support new JSON format
+      let data: string;
+      let encrypted: boolean;
 
-      if (!safeStorage.isEncryptionAvailable()) {
-        // Fallback
-        return { success: true, password: buffer.toString('utf8'), encrypted: false };
+      try {
+        const parsed = JSON.parse(stored);
+        data = parsed.data;
+        encrypted = parsed.encrypted === true;
+      } catch {
+        // Old format or manually added entry
+        data = stored;
+        encrypted = false;
       }
 
-      const decrypted = safeStorage.decryptString(buffer);
-      return { success: true, password: decrypted, encrypted: true };
+      const buffer = Buffer.from(data, 'base64');
+
+      if (encrypted) {
+        if (!safeStorage.isEncryptionAvailable()) {
+          return {
+            success: false, password: '',
+            error: 'Encryption unavailable — cannot decrypt saved password. Please re-enter it and save.'
+          };
+        }
+        try {
+          const decrypted = safeStorage.decryptString(buffer);
+          return { success: true, password: decrypted, encrypted: true };
+        } catch (decErr) {
+          console.error('Decryption failed:', decErr);
+          return {
+            success: false, password: '',
+            error: 'Decryption failed (keyring may be locked). Please re-enter your password and save.'
+          };
+        }
+      } else {
+        // Plain base64 — covers the fallback save path and the manual workaround.
+        return { success: true, password: buffer.toString('utf8'), encrypted: false };
+      }
     } catch (e) {
       console.error('Failed to get password:', e);
       return { success: false, password: '', error: String(e) };
